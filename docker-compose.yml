@@ -1,0 +1,49 @@
+version: '3.8'
+
+services:
+  php:
+    build:
+      context: .
+      target: app_php
+      dockerfile: docker/dev/php/Dockerfile
+    image: fasttrack6/php:dev
+    restart: on-failure
+    working_dir: /app
+    environment:
+      APP_ENV: dev
+      APP_DEBUG: 1
+    depends_on:
+      - database
+    volumes:
+      - .:/app:rw,cached
+
+  nginx:
+    build:
+      context: .
+      target: app_nginx
+      dockerfile: docker/dev/nginx/Dockerfile
+    image: fasttrack6/nginx:dev
+    restart: on-failure
+    working_dir: /app/public
+    ports:
+      - "8080:80"
+    depends_on:
+      - php
+    volumes:
+      - ./public:/app/public
+
+  database:
+    image: postgres:13-alpine
+    restart: on-failure
+    environment:
+      POSTGRES_DB: test
+      POSTGRES_USER: mozg
+      POSTGRES_PASSWORD: mozg
+      PGDATA: /var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    volumes:
+      - fasttrack6:/var/lib/postgresql/data:rw
+
+volumes:
+  fasttrack6:
