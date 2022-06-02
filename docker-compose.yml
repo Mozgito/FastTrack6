@@ -41,7 +41,7 @@ services:
       POSTGRES_PASSWORD: mozg
       PGDATA: /var/lib/postgresql/data
     ports:
-      - "5432:5432"
+      - "5433:5432"
     volumes:
       - fasttrack6:/var/lib/postgresql/data:rw
 
