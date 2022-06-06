@@ -9,9 +9,6 @@ services:
     image: fasttrack6/php:dev
     restart: on-failure
     working_dir: /app
-    environment:
-      APP_ENV: dev
-      APP_DEBUG: 1
     depends_on:
       - database
     volumes:
@@ -36,7 +33,7 @@ services:
     image: postgres:13-alpine
     restart: on-failure
     environment:
-      POSTGRES_DB: test
+      POSTGRES_DB: fasttrack
       POSTGRES_USER: mozg
       POSTGRES_PASSWORD: mozg
       PGDATA: /var/lib/postgresql/data
