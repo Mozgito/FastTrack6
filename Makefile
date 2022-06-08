@@ -15,33 +15,36 @@ rebuild:
 	docker-compose up -d --build
 
 cont:
-	docker exec -it fasttrack6_php_1 sh
+	docker exec -it fasttrack6_php sh
+
+consume:
+	docker exec -d -t fasttrack6_php_consume sh -c 'php bin/console messenger:consume async'
 
 migrate:
-	@echo "==> Run migrations"
+	echo "==> Run migrations"
 ifneq ($(wildcard $(ROOT_DIR)/migrations/Version*),)
-	@docker exec fasttrack6_php_1 php bin/console --no-ansi --no-interaction doctrine:migrations:migrate
-	@docker exec fasttrack6_php_1 php bin/console --no-ansi --no-interaction cache:clear
+	docker exec fasttrack6_php php bin/console --no-ansi --no-interaction doctrine:migrations:migrate
+	docker exec fasttrack6_php php bin/console --no-ansi --no-interaction cache:clear
 else
-	@echo "==> No migrations found"
+	echo "==> No migrations found"
 endif
 
 fixtures:
-	@echo "==> Loading test fixtures"
-	@docker exec fasttrack6_php_1 php bin/console --no-ansi --no-interaction doctrine:fixtures:load
+	echo "==> Loading test fixtures"
+	docker exec fasttrack6_php php bin/console --no-ansi --no-interaction doctrine:fixtures:load
 
 recreate-db:
-	@echo "==> Dropping and creating db"
-	@docker exec fasttrack6_php_1 php bin/console doctrine:database:drop --force
-	@docker exec fasttrack6_php_1 php bin/console doctrine:database:create
+	echo "==> Dropping and creating db"
+	docker exec fasttrack6_php php bin/console doctrine:database:drop --force
+	docker exec fasttrack6_php php bin/console doctrine:database:create
 
 dump-db:
-	docker exec fasttrack6_database_1 pg_dump -U mozg -d fasttrack > db_dump.sql
+	docker exec fasttrack6_database pg_dump -U mozg -d fasttrack > db_dump.sql
 
 restore-db:
-	docker exec -i fasttrack6_database_1 psql -U mozg fasttrack < db_dump.sql
+	docker exec -i fasttrack6_database psql -U mozg fasttrack < db_dump.sql
 
 tests:
-	@docker exec fasttrack6_php_1 php -dpcov.enabled=1 -dpcov.directory=src -dpcov.exclude="~vendor|tests|bin|src/Kernel.php|src/DataFixtures~" -d memory_limit=-1 vendor/bin/phpunit -c phpunit.xml.dist
+	docker exec fasttrack6_php php -dpcov.enabled=1 -dpcov.directory=src -dpcov.exclude="~vendor|tests|bin|src/Kernel.php|src/DataFixtures~" -d memory_limit=-1 vendor/bin/phpunit -c phpunit.xml.dist
 
 .PHONY: tests

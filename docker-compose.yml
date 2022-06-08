@@ -6,13 +6,28 @@ services:
       context: .
       target: app_php
       dockerfile: docker/dev/php/Dockerfile
+    container_name: fasttrack6_php
     image: fasttrack6/php:dev
     restart: on-failure
     working_dir: /app
     depends_on:
       - database
     volumes:
-      - .:/app:rw,cached
+      - .:/app:rw
+
+  php-consume:
+    build:
+      context: .
+      target: app_php
+      dockerfile: docker/dev/php-consume/Dockerfile
+    container_name: fasttrack6_php_consume
+    image: fasttrack6/php-consume:dev
+    restart: on-failure
+    working_dir: /app
+    depends_on:
+      - database
+    volumes:
+      - .:/app:rw
 
   nginx:
     build:
@@ -20,6 +35,7 @@ services:
       target: app_nginx
       dockerfile: docker/dev/nginx/Dockerfile
     image: fasttrack6/nginx:dev
+    container_name: fasttrack6_nginx
     restart: on-failure
     working_dir: /app/public
     ports:
@@ -31,6 +47,7 @@ services:
 
   database:
     image: postgres:13-alpine
+    container_name: fasttrack6_database
     restart: on-failure
     environment:
       POSTGRES_DB: fasttrack
